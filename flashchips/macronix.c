@@ -850,6 +850,57 @@
 		.decode_range	= DECODE_RANGE_SPI25,
         },
 
+
+		{
+			.vendor        = "Macronix",
+			.name          = "MX25L3236F",
+			.bustype       = BUS_SPI,
+			.manufacture_id= MACRONIX_ID,
+			.model_id      = MACRONIX_MX25L3236F,
+			.total_size    = 4096,   /* KB = 32Mbit */
+			.page_size     = 256,
+			.voltage       = {2650, 3600}, /* mV, из даташита 2.65–3.6V */
+			.tested        = TEST_UNTESTED, /* пока не проверено на железе */
+			.feature_bits  = FEATURE_WRSR_WREN | FEATURE_OTP | FEATURE_CFGR | FEATURE_SCUR,
+			.probe         = PROBE_SPI_RDID,
+			.probe_timing  = TIMING_ZERO,
+
+			.read          = SPI_CHIP_READ,       /* поддерживает READ (0x03), FAST_READ (0x0B), QREAD (0x6B), 4READ (0xEB) */
+			.write         = SPI_CHIP_WRITE256,   /* Page Program (0x02), Quad Page Program (0x38) */
+			.gran          = write_gran_256bytes,
+	
+			.block_erasers = {
+				{
+					.eraseblocks = { {4 * 1024, 1024} }, /* 1024 секторов по 4KB */
+					.block_erase = SPI_BLOCK_ERASE_20,   /* SE (0x20) */
+				}, {
+					.eraseblocks = { {32 * 1024, 128} }, /* 128 блоков по 32KB */
+					.block_erase = SPI_BLOCK_ERASE_52,   /* BE32K (0x52) */
+				}, {
+					.eraseblocks = { {64 * 1024, 64} },  /* 64 блока по 64KB */
+					.block_erase = SPI_BLOCK_ERASE_D8,   /* BE (0xD8) */
+				}, {
+					.eraseblocks = { {4 * 1024 * 1024, 1} }, /* полное стирание */
+					.block_erase = SPI_BLOCK_ERASE_60,   /* CE (0x60) */
+				}, {
+					.eraseblocks = { {4 * 1024 * 1024, 1} },
+					.block_erase = SPI_BLOCK_ERASE_C7,   /* CE (0xC7) */
+				}
+			},
+	
+			.printlock     = SPI_PRETTYPRINT_STATUS_REGISTER_BP3_SRWD,
+			.unlock        = SPI_DISABLE_BLOCKPROTECT_BP3_SRWD,
+	
+			.reg_bits = {
+				.srp = {STATUS1, 7, RW}, /* SRWD */
+				.bp  = {{STATUS1, 2, RW}, {STATUS1, 3, RW}, {STATUS1, 4, RW}, {STATUS1, 5, RW}}, /* BP0–BP3 */
+				.tb  = {CONFIG, 3, RW},  /* Top/Bottom bit */
+				.wps = {SECURITY, 7, OTP}, /* WPSEL */
+			},
+	
+			.decode_range  = DECODE_RANGE_SPI25,
+		},
+			
         {
 		.vendor		= "Macronix",
 		.name		= "MX25L3239E",
